@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "experience-bench"
+version = "0.1.0"
+description = "LLM benchmarking tool for measuring effect of system-prompt experience years"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "experience-bench" }]
+dependencies = [
+    "httpx>=0.27.0",
+    "PyYAML>=6.0.2",
+    "rich>=13.7.1",
+    "plotly>=5.24.1",
+    "tqdm>=4.66.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0.0"]
+
+[project.scripts]
+experience-bench = "experience_bench.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-q"

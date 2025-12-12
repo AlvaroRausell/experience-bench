@@ -1,0 +1,29 @@
+id: benchmark
+prompt_template: ../prompts/ttlt_default.md
+
+years: [0, 1, 10, 45, 100]
+models:
+  # - openrouter:openai/gpt-oss-20b:free
+  # - openrouter:mistralai/devstral-2512:free
+  - ollama:granite4:3b
+  - ollama:devstral-small-2:latest
+  # Azure uses deployments (set AZURE_OPENAI_* env vars) and optionally add a line like:
+  # - azureopenai:my-deployment
+
+defaults:
+  runs_per_setting: 1
+  warmup: 1
+  timeout_s: 3600
+  max_output_tokens: 1000000
+  temperature: 0.5
+
+problem:
+  statement_path: statement.txt
+  input_path: input.txt
+
+expected:
+  parts:
+    a:
+      value: "Not gonna spoil it for you :)"
+    b:
+      value: "Not gonna spoil it for you :)"

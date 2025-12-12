@@ -1,0 +1,147 @@
+# experience-bench
+
+Benchmarks LLMs on a config-driven, one-shot programming task while varying a
+system prompt like:
+
+> "You are a software engineer with X years of experience."
+
+It is designed for problems with two answers (Part A + Part B, like on Advent of
+Code) where the model must output a Python program.
+
+## What it measures
+
+- Correctness: Part A pass, Part B pass, and “all parts passed”
+- Speed: non-streaming TTLT (time until the full response is received)
+- Code performance: local execution runtime of the generated program
+
+## Key behaviors
+
+- The puzzle input is never sent to the model.
+  - The prompt contains only the problem statement and output contract.
+  - The input is only provided via stdin when executing the generated script.
+- Generated code is executed locally.
+  - This is not a hardened sandbox. Treat models and prompts as untrusted.
+
+## Providers
+
+Model specs are written as `provider:model` in the benchmark YAML.
+
+- `openrouter:<model>`: OpenRouter (OpenAI-compatible chat completions)
+- `ollama:<model>`: Ollama local models (via `/api/generate`)
+- `azureopenai:<deployment>`: Azure OpenAI Responses API (deployment name)
+  - I have not tested AzureOpenAI integration, you're on your own on that one!
+
+## Install
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
+```
+
+Optional dev deps:
+
+```bash
+pip install -e ".[dev]"
+pytest
+```
+
+## Configure a benchmark
+
+Benchmarks are YAML files like `benchmarks/benchmark.yaml`.
+
+You typically edit:
+
+1. `problem.statement_path`: local file containing the problem statement
+2. `problem.input_path`: local file containing the input
+3. `expected.parts.a.value` / `expected.parts.b.value`: expected answers
+4. `models`: list of model specs
+5. `years`: list of “years of experience” values to run
+
+The prompt template is a Markdown file referenced by `prompt_template` and
+should include `{problem_statement}`. It must not include `{input_payload}`.
+
+## Environment variables
+
+OpenRouter:
+
+- `OPENROUTER_API_KEY` (required)
+- `OPENROUTER_BASE_URL` (optional, default `https://openrouter.ai/api/v1`)
+- `OPENROUTER_HTTP_REFERER` / `OPENROUTER_X_TITLE` (optional)
+
+Ollama:
+
+- `OLLAMA_BASE_URL` (optional, default `http://localhost:11434`)
+
+Azure OpenAI (Responses API):
+
+- `AZURE_OPENAI_ENDPOINT` (required)
+- `AZURE_OPENAI_API_KEY` (required)
+- `AZURE_OPENAI_API_VERSION` (required)
+- `AZURE_OPENAI_DEPLOYMENT` (optional if you use `azureopenai:<deployment>` in
+  `models`)
+
+## Run a benchmark
+
+```bash
+experience-bench run \
+  --benchmark benchmarks/benchmark.yaml \
+  --out results.jsonl
+```
+
+Useful flags:
+
+- `--concurrency N`: run model interactions in parallel (warmups and measured
+  runs)
+- `--output-dir DIR`: where per-trial artifacts are written (default `.output`)
+- `--models ...` / `--years ...`: override YAML from the command line
+
+## Outputs
+
+### Results JSONL
+
+Each trial appends a record to `results.jsonl`.
+
+Notes:
+
+- Token usage is model-scoped. Do not compare token totals across different
+  models.
+
+### Per-trial artifacts
+
+Artifacts are written to:
+
+`<output-dir>/<run-id>/<provider>/<model-key>/years_<Y>/run_<NNN>/`
+
+The `<run-id>` is date-based (UTC), e.g. `20251212_142657_123456Z`.
+
+Files include:
+
+- `prompt_system.txt`, `prompt_user.txt`
+- `completion.txt`
+- `solution.py`
+- `exec_stdout.txt`, `exec_stderr.txt`
+- `record.json`
+
+## Generate the HTML report
+
+```bash
+experience-bench report --in results.jsonl --out reports/report.html
+open reports/report.html
+```
+
+The report includes:
+
+- Pass rate lines split by Part A / Part B / All parts
+- TTLT and execution charts (computed only from runs where at least one part
+  passed)
+- Consistent colors per model across all charts
+
+## Rate limit retries (HTTP 429)
+
+OpenRouter and Azure calls automatically retry on HTTP 429. You can tune this
+via:
+
+- `EXPERIENCE_BENCH_RETRY_429_MAX_ATTEMPTS` (default `5`)
+- `EXPERIENCE_BENCH_RETRY_429_BASE_DELAY_S` (default `1.0`)
+- `EXPERIENCE_BENCH_RETRY_429_MAX_DELAY_S` (default `30.0`)
