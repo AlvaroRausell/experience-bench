@@ -69,6 +69,8 @@ should include `{problem_statement}`. It must not include `{input_payload}`.
 
 ## Environment variables
 
+The CLI will auto-load environment variables from a local `.env` file (searched from your current working directory upwards) if present.
+
 OpenRouter:
 
 - `OPENROUTER_API_KEY` (required)

@@ -13,11 +13,13 @@ src/experience_bench/adapters/__init__.py
 src/experience_bench/adapters/azureopenai.py
 src/experience_bench/adapters/ollama.py
 src/experience_bench/adapters/openrouter.py
+src/experience_bench/adapters/retry.py
 src/experience_bench/adapters/types.py
 src/experience_bench/core/__init__.py
 src/experience_bench/core/code_exec.py
 src/experience_bench/core/code_extract.py
 src/experience_bench/core/config.py
+src/experience_bench/core/dotenv.py
 src/experience_bench/core/eval.py
 src/experience_bench/core/model_spec.py
 src/experience_bench/core/prompts.py
@@ -26,5 +28,9 @@ src/experience_bench/core/run.py
 src/experience_bench/core/storage.py
 src/experience_bench/reporting/__init__.py
 src/experience_bench/reporting/html_report.py
+tests/test_artifacts.py
+tests/test_dotenv.py
 tests/test_eval.py
 tests/test_extract.py
+tests/test_prompts.py
+tests/test_retry.py
