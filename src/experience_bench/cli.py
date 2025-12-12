@@ -6,6 +6,7 @@ from pathlib import Path
 
 from rich.console import Console
 
+from experience_bench.core.dotenv import load_dotenv_if_present
 from experience_bench.core.run import run_benchmark
 from experience_bench.reporting.html_report import build_html_report
 
@@ -53,6 +54,10 @@ def _cmd_report(args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # Load .env early so provider API keys (e.g., OPENROUTER_API_KEY) work
+    # without requiring users to export them in the shell.
+    load_dotenv_if_present()
+
     parser = argparse.ArgumentParser(prog="experience-bench")
     sub = parser.add_subparsers(dest="cmd", required=True)
 
