@@ -10,7 +10,7 @@ from experience_bench.core.records import TrialRecord, trial_record_to_json
 def append_jsonl(path: Path, records: Iterable[TrialRecord]) -> int:
     path.parent.mkdir(parents=True, exist_ok=True)
     n = 0
-    with path.open("a", encoding="utf-8") as f:
+    with path.open("w+", encoding="utf-8") as f:
         for rec in records:
             f.write(json.dumps(trial_record_to_json(rec), ensure_ascii=False))
             f.write("\n")
