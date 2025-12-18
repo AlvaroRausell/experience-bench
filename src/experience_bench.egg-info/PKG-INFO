@@ -9,6 +9,7 @@ Description-Content-Type: text/markdown
 Requires-Dist: httpx>=0.27.0
 Requires-Dist: PyYAML>=6.0.2
 Requires-Dist: python-dotenv>=1.0.1
+Requires-Dist: azure-ai-inference>=1.0.0b9
 Requires-Dist: rich>=13.7.1
 Requires-Dist: plotly>=5.24.1
 Requires-Dist: tqdm>=4.66.0
@@ -85,6 +86,8 @@ The prompt template is a Markdown file referenced by `prompt_template` and
 should include `{problem_statement}`. It must not include `{input_payload}`.
 
 ## Environment variables
+
+The CLI will auto-load environment variables from a local `.env` file (searched from your current working directory upwards) if present.
 
 OpenRouter:
 
